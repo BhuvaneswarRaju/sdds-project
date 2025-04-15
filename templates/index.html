@@ -18,12 +18,13 @@
             <!-- Encrypt Section -->
             <div class="col-md-6">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">1️⃣ Encrypt & Upload File</div>
+                    <div class="card-header bg-primary text-white">1️⃣ Upload File to Encrypt</div>
                     <div class="card-body">
                         <form method="POST" action="/encrypt" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label class="form-label">Select file to encrypt</label>
                                 <input type="file" class="form-control" name="file" required>
+                                <p class="text-muted mt-1">📦 Max file size: 5MB</p>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Encrypt & Upload 🔒</button>
                         </form>

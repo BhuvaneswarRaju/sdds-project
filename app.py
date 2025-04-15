@@ -6,7 +6,13 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Generate encryption key and store it in sdds.key
+# 🛡️ Limit max file size to 5MB
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
+
+# ✅ Always create uploads folder (even on Render)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# 🔑 Load or generate encryption key
 KEY_PATH = 'sdds.key'
 if not os.path.exists(KEY_PATH):
     key = Fernet.generate_key()
@@ -18,10 +24,12 @@ else:
 
 fernet = Fernet(key)
 
+# 🌐 Home Page
 @app.route('/')
 def home():
     return render_template('index.html')
 
+# 🔐 Encrypt route
 @app.route('/encrypt', methods=['POST'])
 def encrypt_file():
     uploaded_file = request.files['file']
@@ -39,6 +47,7 @@ def encrypt_file():
 
     return redirect(url_for('home'))
 
+# 🔓 Decrypt route
 @app.route('/decrypt', methods=['POST'])
 def decrypt_file():
     uploaded_file = request.files['file']
@@ -58,10 +67,11 @@ def decrypt_file():
 
     return redirect(url_for('home'))
 
+# �� Download link
 @app.route('/uploads/<filename>')
 def download_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
+# ▶ Run locally
 if __name__ == '__main__':
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(debug=True)
