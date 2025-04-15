@@ -6,10 +6,10 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# 🛡️ Limit max file size to 5MB
+# 🛡️ Limit file size to 5MB
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
 
-# ✅ Always create uploads folder (even on Render)
+# ✅ Create uploads folder on start
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # 🔑 Load or generate encryption key
@@ -67,10 +67,15 @@ def decrypt_file():
 
     return redirect(url_for('home'))
 
-# �� Download link
+# 📥 Download route
 @app.route('/uploads/<filename>')
 def download_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
+# 🚫 Friendly error for large files
+@app.errorhandler(413)
+def too_large(e):
+    return "<h2>⚠️ File too large!</h2><p>Please upload a file under 5MB.</p><p><a href='/'>← Go back</a></p>", 413
 
 # ▶ Run locally
 if __name__ == '__main__':
