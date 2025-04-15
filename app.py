@@ -6,10 +6,10 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# 🛡️ Limit file size to 5MB
+# 🛡️ Limit max file size to 5MB
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
 
-# ✅ Create uploads folder on start
+# ✅ Always create uploads folder (even on Render)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # 🔑 Load or generate encryption key
@@ -43,7 +43,7 @@ def encrypt_file():
             enc_file.write(encrypted_data)
 
         download_link = url_for('download_file', filename=uploaded_file.filename + '.enc', _external=True)
-        return f"<h2>✅ File Encrypted!</h2><p><a href='{download_link}'>Download Encrypted File</a></p><p><a href='/'>← Go back</a></p>"
+        return f"<h2>✅ File Encrypted!</h2><p><a href='{download_link}'>Download Encrypted File (One-Time Link)</a></p><p><a href='/'>← Go back</a></p>"
 
     return redirect(url_for('home'))
 
@@ -67,12 +67,23 @@ def decrypt_file():
 
     return redirect(url_for('home'))
 
-# 📥 Download route
+# 💣 One-Time Download Route
 @app.route('/uploads/<filename>')
 def download_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-# 🚫 Friendly error for large files
+    if os.path.exists(file_path):
+        # Send the file once
+        response = send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
+        # Delete the file after sending
+        os.remove(file_path)
+
+        return response
+    else:
+        return "<h2>❌ This file is no longer available (it was deleted after first download).</h2><p><a href='/'>← Go back</a></p>", 404
+
+# ⚠️ Friendly file-too-large handler
 @app.errorhandler(413)
 def too_large(e):
     return "<h2>⚠️ File too large!</h2><p>Please upload a file under 5MB.</p><p><a href='/'>← Go back</a></p>", 413
