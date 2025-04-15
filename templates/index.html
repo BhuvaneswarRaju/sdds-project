@@ -9,16 +9,17 @@
 <body>
 
     <div class="container">
-        <h1 style="text-align:center; color:#00ffae;">🔐 Self-Destructing Data System</h1>
+        <h1 style="text-align:center;">🔐 Self-Destructing Data System</h1>
         <p style="text-align:center; margin-bottom: 2rem;">Securely encrypt and decrypt your sensitive files with time control.</p>
 
         <!-- Encrypt Section -->
         <div class="card">
             <div class="card-header">1️⃣ Upload a File to Encrypt</div>
             <form method="POST" action="/encrypt" enctype="multipart/form-data">
-                <input type="file" name="file" required>
+                <label for="enc-file">Select file to encrypt:</label>
+                <input type="file" id="enc-file" name="file" required>
                 <p style="font-size: 0.85rem; margin-top: 0.5rem;">📦 Max file size: 5MB</p>
-                <button type="submit">Encrypt & Upload 🔒</button>
+                <button type="submit">Upload & Encrypt 🔒</button>
             </form>
         </div>
 
@@ -26,7 +27,8 @@
         <div class="card">
             <div class="card-header">2️⃣ Decrypt a File</div>
             <form method="POST" action="/decrypt" enctype="multipart/form-data">
-                <input type="file" name="file" required>
+                <label for="dec-file">Select file to decrypt:</label>
+                <input type="file" id="dec-file" name="file" required>
                 <button type="submit">Decrypt & Download 🔓</button>
             </form>
         </div>

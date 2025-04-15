@@ -5,24 +5,27 @@ body {
     padding: 2rem;
 }
 
+h1, .card-header {
+    color: #00bfff; /* neon blue */
+}
+
 .container {
     max-width: 900px;
     margin: auto;
 }
 
 .card {
-    background-color: #151a2e;
+    background-color: #000000; /* black cards */
     border: 1px solid #1e2339;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 0 10px rgba(0,255,128,0.1);
+    box-shadow: 0 0 10px rgba(0,191,255,0.15);
     margin-bottom: 2rem;
 }
 
 .card-header {
     font-weight: bold;
     font-size: 1.2rem;
-    color: #00ffae;
     margin-bottom: 1rem;
 }
 
