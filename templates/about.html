@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About SDDS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+      height: auto;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    body {
+      background-color: #111;
+      color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.08), transparent 50%),
+                  radial-gradient(circle at 75% 75%, rgba(255, 0, 255, 0.08), transparent 50%);
+      background-size: cover;
+      z-index: -2;
+      animation: shift 30s linear infinite;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2300ffee' fill-opacity='0.03'%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='50' cy='50' r='2'/%3E%3Ccircle cx='70' cy='70' r='2'/%3E%3Ccircle cx='90' cy='90' r='2'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 100px 100px;
+      z-index: -1;
+      opacity: 0.3;
+      animation: float 60s linear infinite;
+    }
+
+    @keyframes shift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(10px, -10px); }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-20px); }
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      color: #00ffe5;
+      text-shadow: 0 0 15px #00ffe5;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      color: #9b59b6;
+      margin-top: 2rem;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #ccc;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    a {
+      color: #00ffee;
+      text-decoration: none;
+    }
+
+    .back-link {
+      margin-top: 2rem;
+      display: inline-block;
+      color: #00bfff;
+      font-weight: bold;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+      h2 {
+        font-size: 1.1rem;
+      }
+      p {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>About SDDS</h1>
+
+    <p>Self-Destructing Data System (SDDS) is a secure file sharing platform that encrypts your files and provides a one-time download link which automatically deletes the file after use. It is designed for privacy-focused users, cybersecurity enthusiasts, and anyone who needs to share sensitive data with confidence.</p>
+
+    <h2>Key Features</h2>
+    <p>
+      • One-time download links <br>
+      • AES-based encryption using Python's <code>cryptography</code> module <br>
+      • Auto-deletion after download <br>
+      • Lightweight, futuristic design with glowing UI <br>
+      • Optional expiry cleanup script for server maintenance
+    </p>
+
+    <h2>Use Cases</h2>
+    <p>
+      • Journalists sharing confidential documents<br>
+      • Companies transferring one-time passwords or tokens<br>
+      • Individuals protecting personal files in transit
+    </p>
+
+    <h2>👨‍💻 About the Developer</h2>
+    <p>Built with passion by <strong>Bhuvaneswar Raju Pericharla</strong> as part of a cybersecurity project.</p>
+
+    <a class="back-link" href="/">← Back to Home</a>
+  </div>
+</body>
+</html>

@@ -27,6 +27,11 @@ fernet = Fernet(key)
 def home():
     return render_template('index.html')
 
+# About
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
 # Encrypt and save
 @app.route('/encrypt', methods=['POST'])
 def encrypt_file():
