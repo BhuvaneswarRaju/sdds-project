@@ -10,12 +10,28 @@
   <link rel="stylesheet" href="/static/style.css">
 
   <style>
+    /* === Animated Grid Background === */
     body {
       background-color: #222222;
-      font-family: 'Poppins', sans-serif;
       color: #ffffff;
+      font-family: 'Poppins', sans-serif;
       margin: 0;
       padding: 2rem;
+      background-image:
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-attachment: fixed;
+      animation: pulsegrid 20s linear infinite;
+    }
+
+    @keyframes pulsegrid {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 40px 40px;
+      }
     }
 
     .container {
@@ -24,14 +40,14 @@
       text-align: center;
     }
 
-    /* Futuristic Heading */
+    /* === Header Title === */
     .main-heading {
       font-family: 'Orbitron', sans-serif;
       font-size: 1.9rem;
       font-weight: 600;
       color: #00ffe5;
       text-shadow: 0 0 15px #00ffe5;
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.3rem;
     }
 
     .subtitle {
@@ -40,6 +56,7 @@
       margin-bottom: 2rem;
     }
 
+    /* === Card Section === */
     .section-title {
       font-size: 1.2rem;
       font-weight: bold;
@@ -92,11 +109,12 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
 
     <!-- 🔐 Main Title -->
-    <h1 class="main-heading">🔐 Self-Destructing Data System</h1>
+    <h1 class="main-heading">Self-Destructing Data System</h1>
     <p class="subtitle">Securely encrypt and decrypt your sensitive files with time control</p>
 
     <!-- Upload Section -->
