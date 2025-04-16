@@ -3,15 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <title>File Encrypted</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Lottie Player CDN -->
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+  <!-- Fonts + Basic Style -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
+
   <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #111;
+      color: #eee;
+      padding: 2rem;
+      margin: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
+    }
     .success-box {
       background-color: #000;
       border: 1px solid #00bfff;
       padding: 2rem;
       border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,191,255, 0.3);
+      box-shadow: 0 0 15px rgba(0,191,255, 0.2);
+      margin-top: 1rem;
     }
     .copy-btn {
       background-color: #00bfff;
@@ -22,36 +42,88 @@
       width: 100%;
       border-radius: 5px;
       margin-top: 10px;
+      cursor: pointer;
+      transition: 0.2s ease-in-out;
     }
     .copy-btn:hover {
-      background-color: #00aadd;
+      background-color: #009fd6;
+    }
+    .tooltip {
+      visibility: hidden;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      top: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .tooltip.show {
+      visibility: visible;
+      opacity: 1;
+    }
+    .relative {
+      position: relative;
+      display: inline-block;
+      width: 100%;
     }
     .notice {
       font-size: 0.9rem;
-      color: #aaa;
+      color: #ff4444;
+      font-weight: bold;
       margin-top: 1rem;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h1 style="text-align:center; color:#00bfff;">✅ File Encrypted!</h1>
+    <!-- ✅ Success Animation -->
+    <lottie-player
+      src="https://lottie.host/9e7a6e6c-f8c6-4a63-96bb-b2b5db2a3db7/success.json"
+      background="transparent"
+      speed="1"
+      style="width: 150px; height: 150px; margin: auto;"
+      autoplay
+    ></lottie-player>
+
+    <h1 style="color:#00bfff;">✅ File Encrypted!</h1>
+
     <div class="success-box">
       <p>Here is your secure one-time download link:</p>
-      <input type="text" id="downloadLink" value="{{ link }}" readonly style="width: 100%; padding: 10px; font-size: 1rem; margin-top: 10px;">
+
+      <!-- Link + Copy Button -->
+      <div class="relative">
+        <input type="text" id="downloadLink" value="{{ link }}" readonly style="width: 100%; padding: 10px; font-size: 1rem;">
+        <div id="tooltip" class="tooltip">Link copied!</div>
+      </div>
       <button class="copy-btn" onclick="copyLink()">📋 Copy Link</button>
+
+      <!-- Warning -->
       <p class="notice">⚠️ Don’t open this link yourself. Share it with your recipient. The file will self-destruct after first access.</p>
     </div>
-    <p style="text-align:center; margin-top: 2rem;"><a href="/" style="color:#00bfff;">← Upload another file</a></p>
+
+    <!-- Back Link -->
+    <p style="margin-top: 2rem;">
+      <a href="/" style="color:#00bfff;">← Upload another file</a>
+    </p>
   </div>
 
   <script>
     function copyLink() {
       var copyText = document.getElementById("downloadLink");
+      var tooltip = document.getElementById("tooltip");
       copyText.select();
       copyText.setSelectionRange(0, 99999);
       document.execCommand("copy");
-      alert("🔗 Link copied to clipboard!");
+
+      tooltip.classList.add("show");
+      setTimeout(() => tooltip.classList.remove("show"), 2000);
     }
   </script>
 </body>
