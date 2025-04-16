@@ -1,15 +1,16 @@
 from flask import Flask, render_template, request, send_from_directory, redirect, url_for
 import os
 from cryptography.fernet import Fernet
+import cleanup  # Auto-run cleanup on startup
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# 🛡️ Limit max file size to 5MB
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
+# 🛡️ Max file size = 5MB
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 
-# ✅ Always create uploads folder (even on Render)
+# ✅ Create uploads folder if it doesn't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # 🔑 Load or generate encryption key
@@ -43,7 +44,7 @@ def encrypt_file():
             enc_file.write(encrypted_data)
 
         download_link = url_for('download_file', filename=uploaded_file.filename + '.enc', _external=True)
-        return f"<h2>✅ File Encrypted!</h2><p><a href='{download_link}'>Download Encrypted File (One-Time Link)</a></p><p><a href='/'>← Go back</a></p>"
+        return render_template('success.html', link=download_link)
 
     return redirect(url_for('home'))
 
@@ -67,27 +68,23 @@ def decrypt_file():
 
     return redirect(url_for('home'))
 
-# 💣 One-Time Download Route
+# 💣 One-time download route
 @app.route('/uploads/<filename>')
 def download_file(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
     if os.path.exists(file_path):
-        # Send the file once
         response = send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
-
-        # Delete the file after sending
-        os.remove(file_path)
-
+        os.remove(file_path)  # Delete after 1st download
         return response
     else:
         return "<h2>❌ This file is no longer available (it was deleted after first download).</h2><p><a href='/'>← Go back</a></p>", 404
 
-# ⚠️ Friendly file-too-large handler
+# ⚠️ Handle oversized uploads
 @app.errorhandler(413)
 def too_large(e):
     return "<h2>⚠️ File too large!</h2><p>Please upload a file under 5MB.</p><p><a href='/'>← Go back</a></p>", 413
 
-# ▶ Run locally
+# ▶ Run the app
 if __name__ == '__main__':
     app.run(debug=True)

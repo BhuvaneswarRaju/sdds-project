@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Encrypted</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .success-box {
+            background-color: #000;
+            border: 1px solid #00bfff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,191,255, 0.3);
+        }
+        .copy-btn {
+            background-color: #00bfff;
+            color: black;
+            font-weight: bold;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .copy-btn:hover {
+            background-color: #00aadd;
+        }
+        .notice {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align:center; color:#00bfff;">✅ File Encrypted!</h1>
+        <div class="success-box">
+            <p>Here is your secure one-time download link:</p>
+            <input type="text" id="downloadLink" value="{{ link }}" readonly style="width: 100%; padding: 10px; font-size: 1rem; margin-top: 10px;">
+            <button class="copy-btn" onclick="copyLink()">📋 Copy Link</button>
+            <p class="notice">⚠️ This link will be deleted after the first download.</p>
+        </div>
+        <p style="text-align:center; margin-top: 2rem;"><a href="/" style="color:#00bfff;">← Upload another file</a></p>
+    </div>
+
+    <script>
+    function copyLink() {
+        var copyText = document.getElementById("downloadLink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        alert("🔗 Link copied to clipboard!");
+    }
+    </script>
+</body>
+</html>
