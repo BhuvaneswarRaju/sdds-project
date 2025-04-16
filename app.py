@@ -5,12 +5,12 @@ from cryptography.fernet import Fernet
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB max
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB limit
 
-# Create uploads folder if it doesn't exist
+# Ensure uploads/ exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Load or generate Fernet key
+# Load or generate key
 KEY_PATH = 'sdds.key'
 if not os.path.exists(KEY_PATH):
     key = Fernet.generate_key()
@@ -22,30 +22,32 @@ else:
 
 fernet = Fernet(key)
 
-# Home route
+# Home
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# Encrypt and save file
+# Encrypt + upload
 @app.route('/encrypt', methods=['POST'])
 def encrypt_file():
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
 
+        # Encrypt and save
         file_data = uploaded_file.read()
         encrypted_data = fernet.encrypt(file_data)
 
         with open(file_path + '.enc', 'wb') as enc_file:
             enc_file.write(encrypted_data)
 
+        # Generate download link
         download_link = url_for('download_file', filename=uploaded_file.filename + '.enc', _external=True)
         return render_template('success.html', link=download_link)
 
     return redirect(url_for('home'))
 
-# Decrypt file
+# Decrypt uploaded file
 @app.route('/decrypt', methods=['POST'])
 def decrypt_file():
     uploaded_file = request.files['file']
@@ -66,29 +68,39 @@ def decrypt_file():
 
     return redirect(url_for('home'))
 
-# One-time download with preview detection
+# Show download confirmation page
 @app.route('/uploads/<filename>', methods=['GET'])
 def download_file(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
     if os.path.exists(file_path):
-        # Block preview bots and prefetchers
+        # Block bots/previews
         user_agent = request.headers.get('User-Agent', '').lower()
         if "whatsapp" in user_agent or "bot" in user_agent or "preview" in user_agent or "fetch" in user_agent:
             return make_response("⏳ Preparing your file. Please open this link in a browser.", 200)
 
-        # Real user → download and delete
+        # Show branded download page
+        return render_template("download.html", filename=filename)
+
+    return "<h2>❌ This file is no longer available.</h2><p><a href='/'>← Go back</a></p>", 404
+
+# Actual download action (POST only)
+@app.route('/start-download/<filename>', methods=['POST'])
+def start_download(filename):
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    if os.path.exists(file_path):
         response = send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
         os.remove(file_path)
         return response
 
-    return "<h2>❌ This file is no longer available.</h2><p><a href='/'>← Go back</a></p>", 404
+    return "<h2>❌ This file is no longer available or already downloaded.</h2><p><a href='/'>← Go back</a></p>", 404
 
-# File too large handler
+# File too large error
 @app.errorhandler(413)
 def file_too_large(e):
-    return "<h2>⚠️ File too large!</h2><p>Please upload a file under 5MB.</p><p><a href='/'>← Go back</a></p>", 413
+    return "<h2>⚠️ File too large!</h2><p>Upload limit: 5MB</p><p><a href='/'>← Go back</a></p>", 413
 
-# Start app (Render-compatible)
+# Run app (Render-compatible)
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
