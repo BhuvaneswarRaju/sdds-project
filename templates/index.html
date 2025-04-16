@@ -4,34 +4,58 @@
   <meta charset="UTF-8">
   <title>SDDS - Encrypt & Decrypt</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
+
   <style>
     body {
       background-color: #222222;
-      color: #ffffff;
       font-family: 'Poppins', sans-serif;
-      padding: 2rem;
+      color: #ffffff;
       margin: 0;
+      padding: 2rem;
     }
+
     .container {
-      max-width: 600px;
+      max-width: 650px;
       margin: auto;
+      text-align: center;
     }
+
+    /* Futuristic Heading */
+    .main-heading {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 600;
+      color: #00ffe5;
+      text-shadow: 0 0 15px #00ffe5;
+      margin-bottom: 0.2rem;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: #aaa;
+      margin-bottom: 2rem;
+    }
+
     .section-title {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: bold;
-      color: #9b59b6; /* Kali Linux purple */
+      color: #9b59b6;
       margin-bottom: 1rem;
     }
+
     .card {
       background-color: #000000;
       border: 1px solid #444;
       padding: 1.5rem;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      box-shadow: 0 0 15px rgba(106, 27, 154, 0.2);
       margin-bottom: 2rem;
     }
+
     .btn {
       background-color: #00bfff;
       color: black;
@@ -44,13 +68,36 @@
       margin-top: 10px;
       transition: 0.2s ease-in-out;
     }
+
     .btn:hover {
-      background-color: #009fd6;
+      background-color: #00ffee;
+      color: #000;
+      box-shadow: 0 0 10px #00ffee, 0 0 25px #00ffee;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      background-color: #111;
+      border-radius: 5px;
+      border: 1px solid #555;
+      color: white;
+    }
+
+    .footer {
+      color: #888;
+      font-size: 0.85rem;
+      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
+
+    <!-- 🔐 Main Title -->
+    <h1 class="main-heading">🔐 Self-Destructing Data System</h1>
+    <p class="subtitle">Securely encrypt and decrypt your sensitive files with time control</p>
 
     <!-- Upload Section -->
     <div class="card">
@@ -72,7 +119,7 @@
     </div>
 
     <!-- Footer -->
-    <p style="text-align: center; color: #999;">Built by Bhuvaneswar Raju Pericharla © 2025</p>
+    <p class="footer">Built by Bhuvaneswar Raju Pericharla © 2025</p>
   </div>
 </body>
 </html>
