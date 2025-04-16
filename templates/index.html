@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <title>SDDS - Encrypt & Decrypt</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
@@ -16,114 +14,83 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
-
     body {
       background-color: #111;
-      color: #ffffff;
+      color: #fff;
       font-family: 'Poppins', sans-serif;
-      margin: 0;
       padding: 2rem;
+      margin: 0;
       position: relative;
     }
-
     body::before {
       content: "";
       position: fixed;
       top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.08), transparent 50%),
-                  radial-gradient(circle at 75% 75%, rgba(255, 0, 255, 0.08), transparent 50%);
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 25% 25%, rgba(0,255,255,0.08), transparent 50%),
+                  radial-gradient(circle at 75% 75%, rgba(255,0,255,0.08), transparent 50%);
       background-size: cover;
       z-index: -2;
       animation: shift 30s linear infinite;
     }
-
     body::after {
       content: "";
       position: fixed;
       top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2300ffee' fill-opacity='0.03'%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='50' cy='50' r='2'/%3E%3Ccircle cx='70' cy='70' r='2'/%3E%3Ccircle cx='90' cy='90' r='2'/%3E%3C/g%3E%3C/svg%3E");
+      width: 100%; height: 100%;
+      background: url("data:image/svg+xml,%3Csvg ... %3E"); /* keep as is */
       background-size: 100px 100px;
       z-index: -1;
       opacity: 0.3;
       animation: float 60s linear infinite;
     }
+    @keyframes shift { 0% { transform: translate(0, 0); } 100% { transform: translate(10px, -10px); }}
+    @keyframes float { 0% { transform: translateY(0); } 100% { transform: translateY(-20px); }}
 
-    @keyframes shift {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(10px, -10px); }
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-20px); }
-    }
-
-    /* === Layout === */
     .top-nav {
       position: absolute;
       top: 1rem;
       right: 1.5rem;
     }
-
     .top-nav a {
-      font-size: 0.95rem;
       color: #00ffee;
       text-decoration: none;
       font-weight: bold;
-      font-family: 'Poppins', sans-serif;
     }
-
     .container {
       max-width: 650px;
       margin: auto;
       text-align: center;
       padding-top: 3rem;
     }
-
-    h1.main-heading {
+    h1 {
       font-family: 'Orbitron', sans-serif;
       font-size: 2rem;
       color: #00ffe5;
       text-shadow: 0 0 15px #00ffe5;
-      margin-bottom: 0.3rem;
     }
-
     .subtitle {
-      font-size: 1rem;
       color: #aaa;
       margin-bottom: 2rem;
     }
-
-    .section-title {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #9b59b6;
-      margin-bottom: 1rem;
-    }
-
     .card {
-      background-color: #000000;
+      background: #000;
       border: 1px solid #444;
-      padding: 1.5rem;
       border-radius: 10px;
+      padding: 1.5rem;
       box-shadow: 0 0 15px rgba(106, 27, 154, 0.2);
       margin-bottom: 2rem;
     }
-
-    input[type="file"] {
+    input[type="file"], input[type="email"] {
       width: 100%;
       padding: 10px;
+      margin-top: 10px;
       font-size: 1rem;
-      background-color: #111;
       border-radius: 5px;
+      background-color: #111;
       border: 1px solid #555;
       color: white;
     }
-
     .btn {
       background-color: #00bfff;
       color: black;
@@ -132,64 +99,40 @@
       padding: 10px;
       width: 100%;
       border-radius: 5px;
-      cursor: pointer;
       margin-top: 10px;
-      transition: 0.2s ease-in-out;
+      cursor: pointer;
     }
-
     .btn:hover {
       background-color: #00ffee;
       color: #000;
-      box-shadow: 0 0 10px #00ffee, 0 0 25px #00ffee;
+      box-shadow: 0 0 10px #00ffee;
     }
-
     .footer {
       color: #888;
-      font-size: 0.85rem;
       margin-top: 2rem;
-    }
-
-    @media (max-width: 480px) {
-      .top-nav {
-        top: 0.5rem;
-        right: 1rem;
-      }
-
-      h1.main-heading {
-        font-size: 1.5rem;
-      }
-
-      .subtitle {
-        font-size: 0.95rem;
-      }
-
-      .btn {
-        font-size: 0.95rem;
-      }
+      font-size: 0.85rem;
     }
   </style>
 </head>
-
 <body>
-  <div class="top-nav">
-    <a href="/about">About</a>
-  </div>
+  <div class="top-nav"><a href="/about">About</a></div>
 
   <div class="container">
-    <h1 class="main-heading">Self-Destructing Data System</h1>
-    <p class="subtitle">Securely encrypt and decrypt your sensitive files with time control</p>
+    <h1>Self-Destructing Data System</h1>
+    <p class="subtitle">Encrypt, send, and auto-destroy files with one-time secure links.</p>
 
     <div class="card">
-      <div class="section-title">1️⃣ Upload a File to Encrypt</div>
+      <h3>1️⃣ Upload a File to Encrypt</h3>
       <form method="POST" action="/encrypt" enctype="multipart/form-data">
         <input type="file" name="file" required>
-        <p style="margin: 5px 0;">📦 Max file size: 5MB</p>
-        <button type="submit" class="btn">Upload & Encrypt 🔐</button>
+        <input type="email" name="email" placeholder="Enter your email for notification (optional)">
+        <p>📦 Max file size: 5MB</p>
+        <button type="submit" class="btn">Encrypt & Upload 🔐</button>
       </form>
     </div>
 
     <div class="card">
-      <div class="section-title">2️⃣ Decrypt a File</div>
+      <h3>2️⃣ Decrypt a File</h3>
       <form method="POST" action="/decrypt" enctype="multipart/form-data">
         <input type="file" name="file" required>
         <button type="submit" class="btn">Decrypt & Download 🔓</button>

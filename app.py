@@ -1,16 +1,18 @@
 from flask import Flask, render_template, request, send_from_directory, redirect, url_for, make_response
 import os
 from cryptography.fernet import Fernet
+import smtplib
+from email.mime.text import MIMEText
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB max file size
 
-# Ensure uploads folder exists
+# Make sure upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Load or generate key
+# Load or generate encryption key
 KEY_PATH = 'sdds.key'
 if not os.path.exists(KEY_PATH):
     key = Fernet.generate_key()
@@ -22,35 +24,64 @@ else:
 
 fernet = Fernet(key)
 
-# Home
+# ✅ Email sending function (no password prompt — use app password instead)
+def send_notification_email(to_email, filename):
+    try:
+        sender_email = "sdds.notify@gmail.com"     # 🔁 Replace with your Gmail
+        sender_password = "vpvmrurmnpdlphyf"    # 🔁 Replace with your Gmail App Password
+
+        subject = "Your file has been accessed and deleted"
+        body = f"Hello,\n\nYour file '{filename}' was downloaded and has been securely deleted from the SDDS server.\n\n- SDDS"
+        msg = MIMEText(body)
+        msg['Subject'] = subject
+        msg['From'] = sender_email
+        msg['To'] = to_email
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(sender_email, sender_password)
+            server.send_message(msg)
+
+        print(f"✅ Notification email sent to {to_email}")
+    except Exception as e:
+        print(f"❌ Failed to send email: {e}")
+
+# === Routes ===
+
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# About
-@app.route("/about")
+@app.route('/about')
 def about():
-    return render_template("about.html")
+    return render_template('about.html')
 
-# Encrypt and save
 @app.route('/encrypt', methods=['POST'])
 def encrypt_file():
     uploaded_file = request.files['file']
+    user_email = request.form.get('email')
+
     if uploaded_file.filename != '':
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+        enc_path = file_path + '.enc'
 
+        # Encrypt and save file
         file_data = uploaded_file.read()
         encrypted_data = fernet.encrypt(file_data)
 
-        with open(file_path + '.enc', 'wb') as enc_file:
-            enc_file.write(encrypted_data)
+        with open(enc_path, 'wb') as f:
+            f.write(encrypted_data)
 
+        # Save optional email (next to the file)
+        if user_email:
+            with open(enc_path + '.email', 'w') as f:
+                f.write(user_email.strip())
+
+        # Generate link
         download_link = url_for('download_file', filename=uploaded_file.filename + '.enc', _external=True)
         return render_template('success.html', link=download_link)
 
     return redirect(url_for('home'))
 
-# Decrypt a file
 @app.route('/decrypt', methods=['POST'])
 def decrypt_file():
     uploaded_file = request.files['file']
@@ -67,45 +98,46 @@ def decrypt_file():
 
             return send_from_directory(app.config['UPLOAD_FOLDER'], original_filename, as_attachment=True)
         except:
-            return "<h2>❌ Decryption failed. Invalid or corrupt file.</h2><p><a href='/'>← Go back</a></p>"
+            return "<h2>❌ Decryption failed.</h2><p><a href='/'>← Go back</a></p>"
 
     return redirect(url_for('home'))
 
-# Show branded download page
 @app.route('/uploads/<filename>', methods=['GET'])
 def download_file(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
     if os.path.exists(file_path):
-        # Prevent preview bots from triggering file deletion
+        # Check for bots/previews (like WhatsApp)
         user_agent = request.headers.get('User-Agent', '').lower()
-        if "whatsapp" in user_agent or "bot" in user_agent or "preview" in user_agent or "fetch" in user_agent:
-            return make_response("⏳ Preparing your file. Please open this link in a browser.", 200)
+        if "whatsapp" in user_agent or "bot" in user_agent:
+            return make_response("⚠️ This link must be opened in a browser.", 200)
 
-        # Show download page with file details
-        file_size = os.path.getsize(file_path)
-        display_name = filename.replace('.enc', '')
-        return render_template("download.html", filename=filename, display_name=display_name, size=file_size)
+        # If email exists, notify
+        email_path = file_path + '.email'
+        if os.path.exists(email_path):
+            with open(email_path, 'r') as f:
+                user_email = f.read().strip()
+                send_notification_email(user_email, filename.replace('.enc', ''))
+            os.remove(email_path)
 
-    return "<h2>❌ This file is no longer available.</h2><p><a href='/'>← Go back</a></p>", 404
+        return render_template('download.html', filename=filename,
+                               display_name=filename.replace('.enc', ''),
+                               size=os.path.getsize(file_path))
 
-# Final download + delete
+    return "<h2>❌ This file is no longer available.</h2>", 404
+
 @app.route('/start-download/<filename>', methods=['POST'])
 def start_download(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
     if os.path.exists(file_path):
         response = send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
         os.remove(file_path)
         return response
+    return "<h2>❌ File already accessed or expired.</h2>", 404
 
-    return "<h2>❌ This file is no longer available or already downloaded.</h2><p><a href='/'>← Go back</a></p>", 404
-
-# Handle large uploads
 @app.errorhandler(413)
 def file_too_large(e):
-    return "<h2>⚠️ File too large!</h2><p>Upload limit: 5MB</p><p><a href='/'>← Go back</a></p>", 413
+    return "<h2>⚠️ File too large!</h2><p>Limit: 5MB</p>", 413
 
-# Run Flask on Render
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+    app.run(debug=True)
