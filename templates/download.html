@@ -10,6 +10,10 @@
     <div class="container">
         <h1 style="color: #00bfff; text-align: center;">🔐 Your file is ready to download</h1>
         <div class="card">
+            <p style="text-align: center;">
+                <strong>File:</strong> {{ display_name }}<br>
+                <strong>Size:</strong> {{ '%.2f' % (size / 1024.0) }} KB
+            </p>
             <p style="text-align: center;">This file will self-destruct after downloading.</p>
             <form method="POST" action="/start-download/{{ filename }}">
                 <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px;">⬇️ Download Encrypted File</button>
