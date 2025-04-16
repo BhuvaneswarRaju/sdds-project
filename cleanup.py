@@ -2,7 +2,11 @@ import os
 import time
 
 UPLOAD_FOLDER = 'uploads'
-MAX_FILE_AGE_SECONDS = 3600  # 1 hour = 3600 seconds. You can change to 86400 for 1 day
+MAX_FILE_AGE_SECONDS = 86400  # 1 hour = 3600 seconds. You can change to 86400 for 1 day
+
+if not os.path.exists(UPLOAD_FOLDER):
+    print("🟡 Skipping cleanup: uploads/ folder not found (yet).")
+    exit()
 
 now = time.time()
 deleted = 0
