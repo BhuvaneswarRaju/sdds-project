@@ -1,81 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>SDDS - Encrypt & Decrypt</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', sans-serif;
-      background-color: #111;
-      color: white;
+      height: auto;
+      min-height: 100%;
       overflow-x: hidden;
-      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    body {
+      background-color: #111;
+      color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      position: relative;
     }
 
     body::before {
       content: "";
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100%;
       height: 100%;
-      z-index: -1;
       background: radial-gradient(circle at 20% 30%, rgba(0, 255, 255, 0.2), transparent 60%),
                   radial-gradient(circle at 80% 70%, rgba(183, 0, 255, 0.18), transparent 60%),
                   linear-gradient(to bottom, #111111, #111111);
+      z-index: -2;
+      animation: shift 30s linear infinite;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2300ffee' fill-opacity='0.03'%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='50' cy='50' r='2'/%3E%3Ccircle cx='70' cy='70' r='2'/%3E%3Ccircle cx='90' cy='90' r='2'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 100px 100px;
+      z-index: -1;
+      opacity: 0.3;
+      animation: float 60s linear infinite;
+    }
+
+    @keyframes shift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(10px, -10px); }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-20px); }
+    }
+
+    .top-nav {
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+    }
+
+    .top-nav a {
+      font-size: 0.95rem;
+      color: #00ffee;
+      text-decoration: none;
+      font-weight: bold;
     }
 
     .container {
       max-width: 650px;
       margin: auto;
       text-align: center;
-      padding: 2rem 1rem 4rem;
+      padding-top: 3rem;
     }
 
-    h1 {
+    h1.main-heading {
       font-family: 'Orbitron', sans-serif;
       font-size: 2rem;
-      color: #00fff2;
-      text-shadow: 0 0 12px #00fff2;
-      margin-bottom: 1rem;
+      color: #00ffe5;
+      text-shadow: 0 0 15px #00ffe5;
+      margin-bottom: 0.3rem;
     }
 
     .subtitle {
+      font-size: 1rem;
       color: #aaa;
       margin-bottom: 2rem;
     }
 
-    .card {
-      background: #000;
-      border: 1px solid #444;
-      border-radius: 10px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 0 15px rgba(106, 27, 154, 0.2);
-    }
-
-    .card h3 {
-      color: #E6E6FA;
-      text-shadow: 0 0 8px #E6E6FA;
+    .section-title {
+      font-size: 1.2rem;
       font-weight: bold;
-      font-size: 1.1rem;
+      color: #c084f5;
+      text-shadow: 0 0 4px #c084f5;
       margin-bottom: 1rem;
     }
 
-    input[type="file"],
-    input[type="email"] {
+    .card {
+      background-color: #000000;
+      border: 1px solid #444;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(106, 27, 154, 0.2);
+      margin-bottom: 2rem;
+    }
+
+    input[type="file"], input[type="email"] {
       width: 100%;
       padding: 10px;
-      margin-top: 10px;
       font-size: 1rem;
-      border-radius: 5px;
       background-color: #111;
+      border-radius: 5px;
       border: 1px solid #555;
       color: white;
+      margin-top: 10px;
     }
 
     .btn {
@@ -86,70 +130,67 @@
       padding: 10px;
       width: 100%;
       border-radius: 5px;
-      margin-top: 10px;
       cursor: pointer;
+      margin-top: 10px;
+      transition: 0.2s ease-in-out;
     }
 
     .btn:hover {
       background-color: #00ffee;
       color: #000;
-      box-shadow: 0 0 10px #00ffee;
+      box-shadow: 0 0 10px #00ffee, 0 0 25px #00ffee;
     }
 
     .footer {
       color: #888;
-      margin-top: 2rem;
       font-size: 0.85rem;
+      margin-top: 2rem;
     }
 
-    .top-nav {
-      position: absolute;
-      top: 1rem;
-      right: 1.5rem;
-    }
+    @media (max-width: 480px) {
+      .top-nav {
+        top: 0.5rem;
+        right: 1rem;
+      }
 
-    .top-nav a {
-      color: #00ffee;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    @media screen and (max-width: 600px) {
-      h1 {
+      h1.main-heading {
         font-size: 1.5rem;
       }
-      .card {
-        padding: 1rem;
+
+      .subtitle {
+        font-size: 0.95rem;
       }
-      input, .btn {
+
+      .btn {
         font-size: 0.95rem;
       }
     }
   </style>
 </head>
+
 <body>
-  <div class="top-nav"><a href="/about">About</a></div>
+  <div class="top-nav">
+    <a href="/about">About</a>
+  </div>
 
   <div class="container">
-    <h1>Self-Destructing Data System</h1>
+    <h1 class="main-heading">Self-Destructing Data System</h1>
     <p class="subtitle">Securely encrypt, send and decrypt your sensitive files with one-time secure links.</p>
 
-    <!-- Upload Card -->
     <div class="card">
-      <h3>1️⃣ Upload a File to Encrypt</h3>
+      <div class="section-title">1️⃣ Upload a File to Encrypt</div>
       <form method="POST" action="/encrypt" enctype="multipart/form-data">
-        <input type="file" name="file" required />
-        <input type="email" name="email" placeholder="Enter your email for notification (optional)" />
-        <p>📦 Max file size: 5MB</p>
+        <input type="file" name="file" required>
+        <input type="email" name="email" placeholder="Enter your email for notification (optional)">
+        <p style="margin: 5px 0;">📦 Max file size: 5MB</p>
         <button type="submit" class="btn">Encrypt & Upload 🔐</button>
       </form>
     </div>
 
-    <!-- Decrypt Card -->
     <div class="card">
-      <h3>2️⃣ Decrypt a File</h3>
+      <div class="section-title">2️⃣ Decrypt a File</div>
       <form method="POST" action="/decrypt" enctype="multipart/form-data">
-        <input type="file" name="file" required />
+        <input type="file" name="file" required>
         <button type="submit" class="btn">Decrypt & Download 🔓</button>
       </form>
     </div>
