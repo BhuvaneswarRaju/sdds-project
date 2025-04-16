@@ -9,6 +9,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
+    /* === Fix mobile scroll === */
+    html, body {
+      height: auto;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     /* === Background: Glowing Grid and Neon Swirls === */
     body {
       background-color: #111;
@@ -17,7 +26,6 @@
       margin: 0;
       padding: 2rem;
       position: relative;
-      overflow: hidden;
     }
 
     body::before {
