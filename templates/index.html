@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
-    /* === Fix mobile scroll === */
     html, body {
       height: auto;
       min-height: 100%;
@@ -18,7 +17,6 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    /* === Background: Glowing Grid and Neon Swirls === */
     body {
       background-color: #111;
       color: #ffffff;
@@ -65,11 +63,25 @@
     }
 
     /* === Layout === */
+    .top-nav {
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+    }
+
+    .top-nav a {
+      font-size: 0.95rem;
+      color: #00ffee;
+      text-decoration: none;
+      font-weight: bold;
+      font-family: 'Poppins', sans-serif;
+    }
+
     .container {
       max-width: 650px;
       margin: auto;
       text-align: center;
-      padding: 1rem;
+      padding-top: 3rem;
     }
 
     h1.main-heading {
@@ -138,6 +150,11 @@
     }
 
     @media (max-width: 480px) {
+      .top-nav {
+        top: 0.5rem;
+        right: 1rem;
+      }
+
       h1.main-heading {
         font-size: 1.5rem;
       }
@@ -154,6 +171,10 @@
 </head>
 
 <body>
+  <div class="top-nav">
+    <a href="/about">About</a>
+  </div>
+
   <div class="container">
     <h1 class="main-heading">Self-Destructing Data System</h1>
     <p class="subtitle">Securely encrypt and decrypt your sensitive files with time control</p>
