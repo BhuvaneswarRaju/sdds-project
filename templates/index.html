@@ -5,7 +5,6 @@
   <title>SDDS - Encrypt & Decrypt</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
   <style>
     html, body {
       height: auto;
@@ -30,9 +29,10 @@
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at 20% 30%, rgba(0, 255, 255, 0.2), transparent 45%),
-                  radial-gradient(circle at 80% 70%, rgba(183, 0, 255, 0.18), transparent 45%),
-                  linear-gradient(to bottom, #111111, #111111);
+      background:
+        radial-gradient(circle at 20% 30%, rgba(0, 255, 255, 0.2), transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(183, 0, 255, 0.18), transparent 45%),
+        linear-gradient(to bottom, #111111, #111111);
       z-index: -2;
       animation: shift 30s linear infinite;
     }
@@ -71,6 +71,7 @@
       color: #00ffee;
       text-decoration: none;
       font-weight: bold;
+      font-family: 'Poppins', sans-serif;
     }
 
     .container {
@@ -97,13 +98,13 @@
     .section-title {
       font-size: 1.2rem;
       font-weight: bold;
-      color: #c084f5;
-      text-shadow: 0 0 4px #c084f5;
+      color: #e6e6fa;
+      text-shadow: 0 0 4px #e6e6fa;
       margin-bottom: 1rem;
     }
 
     .card {
-      background-color: #000000;
+      background-color: #000;
       border: 1px solid #444;
       padding: 1.5rem;
       border-radius: 10px;
@@ -119,7 +120,7 @@
       border-radius: 5px;
       border: 1px solid #555;
       color: white;
-      margin-top: 10px;
+      margin-bottom: 10px;
     }
 
     .btn {
@@ -180,7 +181,7 @@
     <div class="card">
       <div class="section-title">1️⃣ Upload a File to Encrypt</div>
       <form method="POST" action="/encrypt" enctype="multipart/form-data">
-        <input type="file" name="file" required>
+        <input type="file" name="file" id="encryptFile" required>
         <input type="email" name="email" placeholder="Enter your email for notification (optional)">
         <p style="margin: 5px 0;">📦 Max file size: 5MB</p>
         <button type="submit" class="btn">Encrypt & Upload 🔐</button>
