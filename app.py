@@ -1,143 +1,134 @@
-from flask import Flask, render_template, request, send_from_directory, redirect, url_for, make_response
-import os
+from flask import Flask, render_template, request, send_from_directory, redirect, url_for, flash
+from werkzeug.utils import secure_filename
+from werkzeug.exceptions import RequestEntityTooLarge
 from cryptography.fernet import Fernet
+import os
+import time
 import smtplib
 from email.mime.text import MIMEText
 
 app = Flask(__name__)
+app.secret_key = 'sdds-secret-key'
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
 
-# Make sure upload folder exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-# Load or generate encryption key
-KEY_PATH = 'sdds.key'
-if not os.path.exists(KEY_PATH):
+# Generate or load key
+KEY_FILE = 'sdds.key'
+if not os.path.exists(KEY_FILE):
     key = Fernet.generate_key()
-    with open(KEY_PATH, 'wb') as f:
+    with open(KEY_FILE, 'wb') as f:
         f.write(key)
 else:
-    with open(KEY_PATH, 'rb') as f:
+    with open(KEY_FILE, 'rb') as f:
         key = f.read()
 
 fernet = Fernet(key)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# ✅ Email sending function (no password prompt — use app password instead)
-def send_notification_email(to_email, filename):
-    try:
-        sender_email = "sdds.notify@gmail.com"     # 🔁 Replace with your Gmail
-        sender_password = "vpvmrurmnpdlphyf"    # 🔁 Replace with your Gmail App Password
-
-        subject = "Your file has been accessed and deleted"
-        body = f"Hello,\n\nYour file '{filename}' was downloaded and has been securely deleted from the SDDS server.\n\n- SDDS"
-        msg = MIMEText(body)
-        msg['Subject'] = subject
-        msg['From'] = sender_email
-        msg['To'] = to_email
-
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(sender_email, sender_password)
-            server.send_message(msg)
-
-        print(f"✅ Notification email sent to {to_email}")
-    except Exception as e:
-        print(f"❌ Failed to send email: {e}")
-
-# === Routes ===
+# === ROUTES ===
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
 @app.route('/encrypt', methods=['POST'])
 def encrypt_file():
-    uploaded_file = request.files['file']
-    user_email = request.form.get('email')
+    uploaded_file = request.files.get('file')
+    email = request.form.get('email')
 
-    if uploaded_file.filename != '':
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
-        enc_path = file_path + '.enc'
+    if uploaded_file and uploaded_file.filename != '':
+        filename = secure_filename(uploaded_file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        encrypted_path = file_path + '.enc'
 
-        # Encrypt and save file
         file_data = uploaded_file.read()
         encrypted_data = fernet.encrypt(file_data)
 
-        with open(enc_path, 'wb') as f:
+        with open(encrypted_path, 'wb') as f:
             f.write(encrypted_data)
 
-        # Save optional email (next to the file)
-        if user_email:
-            with open(enc_path + '.email', 'w') as f:
-                f.write(user_email.strip())
+        download_link = url_for('download_file', filename=filename + '.enc', _external=True)
 
-        # Generate link
-        download_link = url_for('download_file', filename=uploaded_file.filename + '.enc', _external=True)
+        # Optional email notification
+        if email and email.strip() != '':
+            try:
+                send_email_notification(email, download_link)
+            except Exception as e:
+                print(f"Email failed: {e}")
+
         return render_template('success.html', link=download_link)
 
+    flash('No file selected.')
     return redirect(url_for('home'))
 
 @app.route('/decrypt', methods=['POST'])
 def decrypt_file():
-    uploaded_file = request.files['file']
+    uploaded_file = request.files.get('file')
     if uploaded_file and uploaded_file.filename.endswith('.enc'):
+        filename = secure_filename(uploaded_file.filename)
+        encrypted_data = uploaded_file.read()
         try:
-            encrypted_data = uploaded_file.read()
             decrypted_data = fernet.decrypt(encrypted_data)
+        except Exception:
+            return "Decryption failed. Invalid or corrupted file.", 400
 
-            original_filename = uploaded_file.filename.replace('.enc', '')
-            output_path = os.path.join(app.config['UPLOAD_FOLDER'], original_filename)
+        decrypted_filename = filename.rsplit('.enc', 1)[0]
+        decrypted_path = os.path.join(app.config['UPLOAD_FOLDER'], decrypted_filename)
 
-            with open(output_path, 'wb') as f:
-                f.write(decrypted_data)
+        with open(decrypted_path, 'wb') as f:
+            f.write(decrypted_data)
 
-            return send_from_directory(app.config['UPLOAD_FOLDER'], original_filename, as_attachment=True)
-        except:
-            return "<h2>❌ Decryption failed.</h2><p><a href='/'>← Go back</a></p>"
+        return send_from_directory(app.config['UPLOAD_FOLDER'], decrypted_filename, as_attachment=True)
 
+    flash('Invalid encrypted file.')
     return redirect(url_for('home'))
 
-@app.route('/uploads/<filename>', methods=['GET'])
+@app.route('/uploads/<filename>')
 def download_file(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    if not os.path.exists(file_path):
+        return "<h3>❌ This file is no longer available.</h3><a href='/'>← Go back</a>", 404
 
-    if os.path.exists(file_path):
-        # Check for bots/previews (like WhatsApp)
-        user_agent = request.headers.get('User-Agent', '').lower()
-        if "whatsapp" in user_agent or "bot" in user_agent:
-            return make_response("⚠️ This link must be opened in a browser.", 200)
+    os.remove(file_path)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
-        # If email exists, notify
-        email_path = file_path + '.email'
-        if os.path.exists(email_path):
-            with open(email_path, 'r') as f:
-                user_email = f.read().strip()
-                send_notification_email(user_email, filename.replace('.enc', ''))
-            os.remove(email_path)
+# === ERROR HANDLER ===
 
-        return render_template('download.html', filename=filename,
-                               display_name=filename.replace('.enc', ''),
-                               size=os.path.getsize(file_path))
-
-    return "<h2>❌ This file is no longer available.</h2>", 404
-
-@app.route('/start-download/<filename>', methods=['POST'])
-def start_download(filename):
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    if os.path.exists(file_path):
-        response = send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
-        os.remove(file_path)
-        return response
-    return "<h2>❌ File already accessed or expired.</h2>", 404
-
-@app.errorhandler(413)
+@app.errorhandler(RequestEntityTooLarge)
 def file_too_large(e):
-    return "<h2>⚠️ File too large!</h2><p>Limit: 5MB</p>", 413
+    return "<h3>⚠️ File too large. Maximum allowed size is 5MB.</h3><a href='/'>← Go back</a>", 413
+
+# === OPTIONAL EMAIL NOTIFICATION ===
+
+def send_email_notification(recipient_email, download_link):
+    sender_email = "sdds.notify@gmail.com"
+    app_password = "your_app_password_here"  # Use App Password from Gmail settings
+
+    subject = "🔐 Your Encrypted File is Ready"
+    body = f"""
+    Hello,
+
+    Your encrypted file is ready to be downloaded from the secure link below:
+
+    {download_link}
+
+    ⚠️ This file will self-destruct after one access.
+
+    Regards,
+    SDDS
+    """
+
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = "SDDS Notify <sdds.notify@gmail.com>"
+    msg['To'] = recipient_email
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        smtp.login(sender_email, app_password)
+        smtp.send_message(msg)
+
+# === START SERVER ===
 
 if __name__ == '__main__':
     app.run(debug=True)
